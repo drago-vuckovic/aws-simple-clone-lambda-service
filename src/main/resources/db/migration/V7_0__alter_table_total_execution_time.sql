@@ -1,0 +1,1 @@
+ALTER table "total_execution_time" alter column "period_start" type DATE

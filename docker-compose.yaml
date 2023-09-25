@@ -1,0 +1,78 @@
+version: '3.3'
+
+services:
+  postgres-db-lambda:
+    image: postgres
+    container_name: postgres-db-lambda
+    restart: on-failure
+    environment:
+      POSTGRES_DB: pegasus_lambda
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  postgres-db-api-gateway:
+    image: postgres
+    container_name: postgres-db-api-gateway
+    restart: on-failure
+    environment:
+      POSTGRES_DB: pegasus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    volumes:
+      - ./postgres-data-pegasus:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  lambda-service-app:
+    build: .
+    container_name: lambda-service-app
+    depends_on:
+      - postgres-db-lambda
+      - kafka
+      - zookeeper
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-db-lambda:5432/pegasus_lambda
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "8081:8080"
+
+  pegasus-app:
+    build: ../../Pegasus/pegasusbe
+    container_name: pegasus-app
+    depends_on:
+      - postgres-db-api-gateway
+      - kafka
+      - zookeeper
+    environment:
+      POSTGRES_URL: jdbc:postgresql://postgres-db-api-gateway:5432/pegasus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "8080:8080"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1

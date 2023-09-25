@@ -1,0 +1,14 @@
+CREATE TABLE "lambda" (
+      id SERIAL PRIMARY KEY,
+      name CHARACTER VARYING(255) NOT NULL,
+      src_path CHARACTER VARYING(255) NOT NULL,
+      dest_path CHARACTER VARYING(255) NOT NULL,
+      trigger_type INTEGER NOT NULL,
+      lambda_file_path CHARACTER VARYING(255)  NOT NULL,
+      is_enabled BOOLEAN NOT NULL
+);
+
+CREATE SEQUENCE hibernate_sequence INCREMENT 1 MINVALUE 1
+    MAXVALUE 9223372036854775807
+    START 1
+    CACHE 1;

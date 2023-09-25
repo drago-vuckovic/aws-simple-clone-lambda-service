@@ -1,0 +1,2 @@
+ALTER TABLE "lambda"
+    ADD COLUMN lambda_lang INTEGER NOT NULL;

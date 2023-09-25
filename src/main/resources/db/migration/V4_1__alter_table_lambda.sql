@@ -1,0 +1,10 @@
+ALTER TABLE "lambda" DROP COLUMN created_by;
+
+ALTER TABLE "lambda"
+    ADD COLUMN created_by CHARACTER VARYING(255) NOT NULL;
+
+ALTER TABLE "lambda"
+    ADD COLUMN description CHARACTER VARYING(255);
+
+ALTER TABLE "lambda"
+    ADD COLUMN tenant_id INTEGER NOT NULL;

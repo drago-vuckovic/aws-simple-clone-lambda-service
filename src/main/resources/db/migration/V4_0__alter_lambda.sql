@@ -1,0 +1,5 @@
+ALTER TABLE "lambda"
+    ADD COLUMN created_by VARCHAR NOT NULL;
+
+ALTER TABLE "lambda"
+    ADD COLUMN creation_time TIMESTAMP NOT NULL;
